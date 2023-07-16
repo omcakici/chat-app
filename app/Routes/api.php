@@ -31,5 +31,6 @@ return function (App $app) {
 
     // Message routes
     $app->post('/group/{group_id}/message/create', MessageController::class . ':create');
-    $app->get('/group/{group_id}/messages', MessageController::class . ':index');
+    $app->get('/group/{group_id}/messages', MessageController::class . ':listAll');
 };
+

@@ -8,15 +8,22 @@ use Illuminate\Database\Eloquent\Model;
  * It allows for easy database interaction, defines relationships with other models, 
  * and provides access to the user who created the group.
  */
-class Group extends Model {
-
+class Group extends Model
+{
     protected $table = 'groups';
 
     protected $fillable = [
-        'name', 'created_by'
+        'name',
+        'created_by',
     ];
 
-    public function user(){
-        return $this->belongsTo('App\Models\User', 'created_by');
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(User::class, 'group_user');
     }
 }

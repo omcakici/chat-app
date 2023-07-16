@@ -3,25 +3,25 @@ namespace App\Controllers;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use App\Models\GroupUser;
 use App\Models\Group;
+use App\Models\User;
 
 class GroupController
 {
-    /**
-     * This function handles the creation of a new group. 
-     * It requires the 'name' and 'created_by' fields from the incoming request. 
-     * It creates a new group record in the database, then returns the group ID, name, and creator ID in the response.
-     */
     public function create(Request $request, Response $response, $args): Response
     {
-        $data = json_decode($request->getBody()->getContents(), true);
-
-        // error_log(print_r($request->getHeaders(), true));
-        // error_log(print_r($request->getBody()->getContents(), true));
-
+        $data = $request->getParsedBody();
 
         if (!isset($data['name']) || !isset($data['created_by'])) {
             $response->getBody()->write(json_encode(['error' => 'Group name and creator ID are required']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(422);
+        }
+
+        // Check if the creator ID exists in the users table
+        $creatorExists = User::where('id', $data['created_by'])->exists();
+        if (!$creatorExists) {
+            $response->getBody()->write(json_encode(['error' => 'Creator ID does not exist']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(422);
         }
 
@@ -34,12 +34,7 @@ class GroupController
 
         return $response->withHeader('Content-Type', 'application/json');
     }
-
-    /**
-     * This function handles the joining of a user to a group. 
-     * It requires a 'group_id' in the route parameters and a 'user_id' from the incoming request. 
-     * It creates a new record in the group_user table, then returns the group ID and user ID in the response.
-     */
+    
     public function join(Request $request, Response $response, $args): Response
     {
         if (!isset($args['group_id'])) {
@@ -54,12 +49,33 @@ class GroupController
             return $response->withHeader('Content-Type', 'application/json')->withStatus(422);
         }
 
-        $groupUser = new GroupUser();
-        $groupUser->group_id = $args['group_id'];
-        $groupUser->user_id = $data['user_id'];
-        $groupUser->save();
+        // Check if the group ID exists in the groups table
+        $group = Group::find($args['group_id']);
+        if (!$group) {
+            $response->getBody()->write(json_encode(['error' => 'Group ID does not exist']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(422);
+        }
 
-        $response->getBody()->write(json_encode(['group_id' => $groupUser->group_id, 'user_id' => $groupUser->user_id]));
+        // Check if the user ID exists in the users table
+        $userExists = User::where('id', $data['user_id'])->exists();
+        if (!$userExists) {
+            $response->getBody()->write(json_encode(['error' => 'User ID does not exist']));
+            return $response->withHeader('Content-Type', 'application/json')->withStatus(422);
+        }
+
+        // check if the user is already in the group
+        if ($group->users()->where('user_id', $data['user_id'])->exists()) {
+            // If the user is already in the group, return a message
+            $response->getBody()->write(json_encode([
+                'message' => 'User is already in the group'
+            ]));
+            return $response->withHeader('Content-Type', 'application/json');
+        }
+
+        // If not, add the user to the group
+        $group->users()->attach($data['user_id']);
+
+        $response->getBody()->write(json_encode(['group_id' => $group->id, 'user_id' => $data['user_id']]));
 
         return $response->withHeader('Content-Type', 'application/json');
     }

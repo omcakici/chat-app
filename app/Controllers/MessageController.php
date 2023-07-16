@@ -17,7 +17,7 @@ class MessageController
         $data = $request->getParsedBody();
 
         if (!isset($data['user_id']) || !isset($data['group_id']) || !isset($data['message'])) {
-            $response->getBody()->write(json_encode(['error' => 'User ID, Group ID and message are required']));
+            $response->getBody()->write(json_encode(['error' => 'User ID, Group ID, and message are required']));
             return $response->withHeader('Content-Type', 'application/json')->withStatus(422);
         }
 
@@ -29,9 +29,8 @@ class MessageController
 
         $response->getBody()->write(json_encode(['id' => $message->id, 'user_id' => $message->user_id, 'group_id' => $message->group_id, 'message' => $message->message]));
 
-        return $response->withHeader('Content-Type', 'application/json');
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(200);
     }
-
 
     /**
      * This function handles the listing of all messages in a specific group.
