@@ -26,3 +26,16 @@ To run the tests for the chat application, you can use the following commands:
     phpunit tests/MessageTest.php: Runs the tests for message-related operations.
     phpunit tests/GroupTest.php: Runs the tests for group-related operations.
     phpunit tests/UserTest.php: Runs the tests for user-related operations.
+
+Installation and Usage
+
+To install and use the Chat Application, follow these steps:
+
+    Clone the repository: git clone <repository-url>
+    Install the required dependencies: composer install
+    Configure the database: Update the database configuration in config/database.php to point to your SQLite database file.
+    Start the development server: php -S localhost:8000 -t public
+
+Contributing
+
+Contributions to this project are welcome. If you find any issues or have suggestions for improvement, please open an issue or submit a pull request.
