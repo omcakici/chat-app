@@ -19,21 +19,12 @@ return function (App $app) {
     // User routes
     $app->post('/user/create', UserController::class . ':create');
 
-    // $app->post('/user/create', function (Request $request, Response $response, array $args) {
-    //     // Your code to create a new user
-    
-    //     $response->getBody()->write("New user created");
-    //     return $response;
-    // });
-
     $app->post('/debug', function (Request $request, Response $response, $args) {
         $body = $request->getBody();
         $response->getBody()->write($body);
         return $response->withHeader('Content-Type', 'text/plain');
     });
     
-    
-
     // Group routes
     $app->post('/group/create', GroupController::class . ':create');
     $app->put('/group/{group_id}/join', GroupController::class . ':join');

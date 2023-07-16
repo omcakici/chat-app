@@ -17,10 +17,17 @@ class UserController
         error_log('UserController create method was called');
         $data = $request->getParsedBody();
 
-        // Log the incoming data
-        error_log("Data: ", $data);
+        // Check if the request body is empty or not parsed as JSON
+        // if (empty($data)) {
+        //     $response = $response->withHeader('Content-Type', 'application/json')->withStatus(422);
+        //     $response->getBody()->write(json_encode(['error' => 'Invalid JSON data']));
+        //     return $response;
+        // }
+        
+        // error_log($data);
 
         // Validation should be here.
+        error_log(print_r($request->getParsedBody(), true));
         if (!isset($data['username'])) {
             $response = $response->withHeader('Content-Type', 'application/json')->withStatus(422);
             $response->getBody()->write(json_encode(['error' => 'Username is required']));
